@@ -1,0 +1,24 @@
+---
+title: "Reproducible RMarkdown Notebooks"
+site: workflowr::wflow_site
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+
+## Hiseq data analysis
+
+
+* [Hiseq2500 analysis workflow](hiseq.html).
+
+* [Hiseq4000 analysis workflow](hiseq.html).
+
+
+## Novaseq data analysis
+
+
+* [Novaseq 6000 Lane 1 analysis workflow](novaseq.html).
+
+* [Novaseq 6000 Lane 2 analysis workflow](novaseq.html).
+

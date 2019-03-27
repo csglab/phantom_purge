@@ -1,0 +1,18 @@
+---
+title: "Novaseq workflow"
+site: workflowr::wflow_site
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+
+```{r echo=FALSE}
+knitr::asis_output(htmltools::htmlPreserve("
+<div style='position: relative; width: 100%; height: 2900px;'>
+<iframe style='position: absolute; left: 0px; top: 0px; width: 99%; height: 100%; z-index:1;'frameborder='0' 
+scrolling='no' src='calibration.nb.html'></iframe>
+</div>"))
+```
+
+
