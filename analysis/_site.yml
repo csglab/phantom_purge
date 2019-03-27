@@ -1,17 +1,18 @@
 name: "phantom_purge"
-output_dir: ../docs
+output_dir: ../output
 navbar:
-  title: "phantom_purge"
+  title: "Phantom Purge"
   left:
-  - text: Home
-    href: index.html
   - text: About
-    href: about.html
-  - text: License
-    href: license.html
+    href: index.html
+  - text: Anaylsis Notebooks
+    href: notebooks.html
+  right:
+  - text: GitHub Repository
+    href: https://github.com/csglab/phantom_purge
 output:
   workflowr::wflow_html:
     toc: yes
     toc_float: yes
-    theme: cosmo
+    theme: readable
     highlight: textmate

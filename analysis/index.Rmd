@@ -1,9 +1,22 @@
 ---
-title: "Home"
+title: "About"
 site: workflowr::wflow_site
 output:
   workflowr::wflow_html:
     toc: false
 ---
 
-Welcome to my research website.
+Paper Title
+-------
+
+Phantom Purge: The optimal purging of phantom molecules by the robust estimation of the sample index hopping rate in multiplexed droplet-based single-cell RNA-seq data.
+
+
+Summary
+-------
+
+This website hosts code and R Markdown notebooks implementing the statistical modeling approach to estimating the index hopping read in in multiplexed droplet-based single-cell RNA-seq data. The preprint detailing the method can be accessed here.
+
+
+
+
