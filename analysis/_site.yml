@@ -1,5 +1,5 @@
 name: "phantom_purge"
-output_dir: ../output
+output_dir: ../docs
 navbar:
   title: "Phantom Purge"
   left:
