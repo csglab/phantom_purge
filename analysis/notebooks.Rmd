@@ -10,15 +10,15 @@ output:
 ## Hiseq data analysis
 
 
-* [Hiseq2500 analysis workflow](hiseq.html).
+* [Hiseq2500 analysis workflow](workflow_hiseq2500.nb.html).
 
-* [Hiseq4000 analysis workflow](hiseq.html).
+* [Hiseq4000 analysis workflow](workflow_hiseq4000.nb.html).
 
 
 ## Novaseq data analysis
 
 
-* [Novaseq 6000 Lane 1 analysis workflow](novaseq.html).
+* [Novaseq 6000 Lane 1 analysis workflow](workflow_novaseq_l1.nb.html).
 
-* [Novaseq 6000 Lane 2 analysis workflow](novaseq.html).
+* [Novaseq 6000 Lane 2 analysis workflow](workflow_novaseq_l2.nb.html).
 
