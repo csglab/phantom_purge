@@ -1,0 +1,2 @@
+hiseq2500
+hiseq4000

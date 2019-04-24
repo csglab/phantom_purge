@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH --job-name=index_hopping
+#SBATCH --account=def-hsn
+#SBATCH --time=3:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=7
+#SBATCH --mem-per-cpu=50000M
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+module load r/3.5.0
+
+Rscript -e 'library(rmarkdown); rmarkdown::render("1_index_hopping_analysis.Rmd", "html_document")'

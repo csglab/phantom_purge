@@ -1,0 +1,2 @@
+novaseq_l1
+novaseq_l2
