@@ -9,7 +9,7 @@ output:
 Paper Title
 -------
 
-Phantom Purge: The optimal purging of phantom molecules in multiplexed droplet-based single-cell RNA-seq data. ([R. Farouni](http://rfarouni.github.io/) and [H. S. Najafabadi](http://csg.lab.mcgill.ca/), 2019)
+Statistical modeling, estimation, and remediation of sample index hopping in multiplexed droplet-based single-cell RNA-seq data. ([R. Farouni](http://rfarouni.github.io/) and [H. S. Najafabadi](http://csg.lab.mcgill.ca/), 2019)
 
 
 Summary

@@ -9,16 +9,14 @@ output:
 
 ## Hiseq data analysis
 
+* <a href="./assets/notebooks/workflow_hiseq2500.nb.html" target="_blank">Hiseq2500 Analysis Workflow</a>.
 
-* [Hiseq2500 analysis workflow](workflow_hiseq2500.nb.html).
-
-* [Hiseq4000 analysis workflow](workflow_hiseq4000.nb.html).
-
+* <a href="./assets/notebooks/workflow_hiseq4000.nb.html" target="_blank">Hiseq4000 Analysis Workflow</a>.
 
 ## Novaseq data analysis
 
+* <a href="./assets/notebooks/workflow_novaseq_l1.nb.html" target="_blank">Novaseq 6000 Lane 1 Analysis Workflow</a>.
 
-* [Novaseq 6000 Lane 1 analysis workflow](workflow_novaseq_l1.nb.html).
+* <a href="./assets/notebooks/workflow_novaseq_l2.nb.html" target="_blank">Novaseq 6000 Lane 2 Analysis Workflow</a>.
 
-* [Novaseq 6000 Lane 2 analysis workflow](workflow_novaseq_l2.nb.html).
 

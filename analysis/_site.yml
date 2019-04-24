@@ -3,8 +3,6 @@ output_dir: ../docs
 navbar:
   title: "Phantom Purge"
   left:
-  - text: About
-    href: index.html
   - text: Anaylsis Notebooks
     href: notebooks.html
   right:

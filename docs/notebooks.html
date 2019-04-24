@@ -410,7 +410,7 @@ div.section {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -419,7 +419,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#report"> Report <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#report"> Report <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -431,7 +431,7 @@ div.section {
 <strong>Last updated:</strong> 2019-04-23
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>phantom_purge/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -447,22 +447,22 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomcsglabphantompurgetree2549c49dd547d5af8e02c90b2ff1cc12a31d5391targetblank2549c49a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/csglab/phantom_purge/tree/2549c49dd547d5af8e02c90b2ff1cc12a31d5391" target="_blank">2549c49</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomcsglabphantompurgetreefc5e174688c136c093f0574509e072f59022c1dctargetblankfc5e174a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/csglab/phantom_purge/tree/fc5e174688c136c093f0574509e072f59022c1dc" target="_blank">fc5e174</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomcsglabphantompurgetree2549c49dd547d5af8e02c90b2ff1cc12a31d5391targetblank2549c49a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomcsglabphantompurgetreefc5e174688c136c093f0574509e072f59022c1dctargetblankfc5e174a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -475,6 +475,12 @@ Ignored files:
 
 Untracked files:
     Untracked:  docs/assets/
+
+Unstaged changes:
+    Deleted:    analysis/hiseq.Rmd
+    Modified:   analysis/index.Rmd
+    Modified:   analysis/notebooks.Rmd
+    Deleted:    analysis/novaseq.Rmd
 
 </code></pre>
 <p>
@@ -513,6 +519,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/csglab/phantom_purge/fc5e174688c136c093f0574509e072f59022c1dc/docs/notebooks.html" target="_blank">fc5e174</a>
+</td>
+<td>
+rfarouni
+</td>
+<td>
+2019-04-23
+</td>
+<td>
+wflow_git_commit(all = TRUE)
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -574,15 +597,15 @@ Informative commit message
 <div id="hiseq-data-analysis" class="section level2">
 <h2>Hiseq data analysis</h2>
 <ul>
-<li><p><a href="workflow_hiseq2500.nb.html">Hiseq2500 analysis workflow</a>.</p></li>
-<li><p><a href="workflow_hiseq4000.nb.html">Hiseq4000 analysis workflow</a>.</p></li>
+<li><p><a href="./assets/notebooks/workflow_hiseq2500.nb.html" target="_blank">Hiseq2500 Analysis Workflow</a>.</p></li>
+<li><p><a href="./assets/notebooks/workflow_hiseq4000.nb.html" target="_blank">Hiseq4000 Analysis Workflow</a>.</p></li>
 </ul>
 </div>
 <div id="novaseq-data-analysis" class="section level2">
 <h2>Novaseq data analysis</h2>
 <ul>
-<li><p><a href="workflow_novaseq_l1.nb.html">Novaseq 6000 Lane 1 analysis workflow</a>.</p></li>
-<li><p><a href="workflow_novaseq_l2.nb.html">Novaseq 6000 Lane 2 analysis workflow</a>.</p></li>
+<li><p><a href="./assets/notebooks/workflow_novaseq_l1.nb.html" target="_blank">Novaseq 6000 Lane 1 Analysis Workflow</a>.</p></li>
+<li><p><a href="./assets/notebooks/workflow_novaseq_l2.nb.html" target="_blank">Novaseq 6000 Lane 2 Analysis Workflow</a>.</p></li>
 </ul>
 </div>
 
