@@ -19,20 +19,35 @@ output:
 
 # Prepare analysis workflow
 
-### Set parameters
+### Load libraries
+
+
+```{r message=FALSE, warning=FALSE}
+library(rhdf5)
+#library(DropletUtils) # install but not load
+library(tidyverse)
+library(matrixStats)
+library(broom)
+library(furrr)
+library(tictoc)
+library(data.table)
+library(cowplot)
+plan(multiprocess)
+```
+
+### Set filepaths and parameters
 
 ```{r setup}
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file(),
                      fig.width=15,
                      digit=5,
                      scipen=8)
-options(digits=5, 
+options(readr.show_progress = FALSE,
+        digits=5, 
         scipen=8,
         future.globals.maxSize = +Inf)
 ```
 
-
-### Set filepaths and parameters
 
 ```{r}
 dataset_name <- commandArgs(trailingOnly=T)[1]
@@ -85,22 +100,6 @@ Set the trade-off ratio cost cutoff (*torc*). The parameter *torc* represents th
 
 ```{r}
 torc <- 3 
-```
-
-### Load libraries
-
-
-```{r message=FALSE, warning=FALSE}
-library(rhdf5)
-#library(DropletUtils) # install but not load
-library(tidyverse)
-library(matrixStats)
-library(broom)
-library(furrr)
-library(tictoc)
-library(data.table)
-library(cowplot)
-plan(multiprocess)
 ```
 
 
@@ -243,7 +242,8 @@ identify_rna_cells <- function(data_list, output_dir) {
   tic("Running workflow II")
 
   tic("Step 7: identify RNA-containing cells")
-  called_cells_out <- call_cells_all_samples(data_list$umi_counts_cell_gene, output_dir)
+  called_cells_out <- call_cells_all_samples(data_list$umi_counts_cell_gene,
+                                             output_dir)
   toc()
 
   tic("Step 9: tallying molecules by cell-barcode")
@@ -292,7 +292,10 @@ Estimate the sample index hopping probability, infer the true sample of origin, 
 
 
 ```{r}
-data_list <- purge_phantoms(input_dir, output_dir, read_counts_filepath, torc=torc)
+data_list <- purge_phantoms(input_dir,
+                            output_dir,
+                            read_counts_filepath,
+                            torc=torc)
 ```
 
 

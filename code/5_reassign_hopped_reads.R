@@ -94,7 +94,7 @@ reassign_reads_outcome <- function(outcome_counts, S, sample_names) {
     ) %>%
     spread(ss, rr, fill = 0L) %>%
     rename_at(vars(as.character(1:S)), list(~ paste0(sample_names, "_hat")))  %>%
-   # select( -k_chimera)%>%
+    select( -k_chimera)%>%
     select(outcome, s, q, n, everything() ) %>%
     arrange(q)
 
