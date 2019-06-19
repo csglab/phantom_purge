@@ -1,0 +1,495 @@
+---
+title: "Phantom Purge"
+subtitle: "Analysis workflow for `r commandArgs(trailingOnly=T)[1]` data"
+author: 
+- name: Rick Farouni
+  affiliation:
+  - &cruk Génome Québec Innovation Centre, McGill University, Montreal, Canada
+date: '`r format(Sys.Date(), "%Y-%B-%d")`'
+output:
+  html_notebook:
+    df_print: paged
+    code_folding: show
+    toc: no
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
+---
+
+
+# Prepare analysis workflow
+
+### Set parameters
+
+```{r setup}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file(),
+                     fig.width=15,
+                     digit=5,
+                     scipen=8)
+options(digits=5, 
+        scipen=8,
+        future.globals.maxSize = +Inf)
+```
+
+
+### Set filepaths and parameters
+
+```{r}
+dataset_name <- commandArgs(trailingOnly=T)[1]
+#dataset_name <-"hiseq2500"
+message(sprintf("Dataset name: %s", dataset_name))
+```
+
+
+```{r}
+project_dir <- rprojroot::find_rstudio_root_file()
+
+if(is.null(project_dir)){
+  project_dir <- getwd()
+  warning(sprintf("No rstudio project root file  found. 
+                  Setting project directory to current workflow.Rmd file location: %s. 
+                  Override if needed.",
+                  project_dir))
+ 
+}
+message(sprintf("Project directory: %s",
+                project_dir))
+```
+
+
+Each sample's *molecule_info.h5* file should be renamed to *{sample_name}.h5* and placed in *../project_dir/data/{dataset_name}/input/*. The purged UMI count matrices and other output files are saved to *../project_dir/data/{dataset_name}/output/*.
+```{r}
+code_dir <- file.path(project_dir, "code")
+data_dir <- file.path(project_dir, "data", 
+                      dataset_name)
+input_dir <- file.path(data_dir, "input")
+output_dir <- file.path(data_dir, "output")
+figures_dir <- file.path(output_dir, "figures")
+read_counts_filepath <- file.path(output_dir,
+                                  sprintf("%s_read_counts.rds", 
+                                          dataset_name))
+results_filepath <- file.path(output_dir, 
+                              sprintf("%s_results.rds", 
+                                      dataset_name))
+```
+
+
+Create directories if they don't exist.
+```{r}
+dir.create(output_dir)
+dir.create(figures_dir)
+```
+
+
+Set the trade-off ratio cost cutoff (*torc*). The parameter *torc* represents the number of real molecules one is willing to incorrectly discard in order to correctly purge one phantom molecule. Since discarding a large proportion of the data is undesirable, reasonable values of *torc* are expected to be within the range of 1-5.
+
+```{r}
+torc <- 3 
+```
+
+### Load libraries
+
+
+```{r message=FALSE, warning=FALSE}
+library(rhdf5)
+#library(DropletUtils) # install but not load
+library(tidyverse)
+library(matrixStats)
+library(broom)
+library(furrr)
+library(tictoc)
+library(data.table)
+library(cowplot)
+plan(multiprocess)
+```
+
+
+### Load functions
+
+
+```{r message=FALSE}
+source(file.path(code_dir, "1_create_joined_counts_table.R"))
+source(file.path(code_dir, "2_create_counts_by_outcome_table.R"))
+source(file.path(code_dir, "3_estimate_sample_index_hopping_rate.R"))
+source(file.path(code_dir, "4_compute_summary_statistics.R"))
+source(file.path(code_dir, "5_reassign_hopped_reads.R"))
+source(file.path(code_dir, "6_purge_phantom_molecules.R"))
+source(file.path(code_dir, "7_call_cells.R"))
+source(file.path(code_dir, "8_summarize_purge.R"))
+source(file.path(code_dir, "9_plotting_functions.R"))
+```
+
+
+
+### Define workflow functions
+
+```{r}
+purge_phantoms <- function(input_dir,
+                           output_dir,
+                           read_counts_filepath = NULL,
+                           torc = 3,
+                           max_r = NULL) {
+  tic("Running workflow I")
+
+
+  tic("Step 1: loading molecule_info files and creating read counts datatable")
+  read_counts <- create_joined_counts(input_dir, read_counts_filepath)
+  toc()
+
+
+  sample_names <-
+    setdiff(
+      colnames(read_counts),
+      c("cell", "umi", "gene", "outcome")
+    )
+
+  S <- length(sample_names)
+
+  tic("Step 2: creating outcome counts datatable with grouping vars")
+
+  outcome_counts <- create_outcome_counts(read_counts, sample_names)
+  toc()
+
+  tic("Step 3: creating a chimera counts datatable and estimating hopping rate")
+  fit_out <-
+    estimate_hopping_rate(
+      outcome_counts,
+      S,
+      max_r = max_r
+    )
+  toc()
+
+  # compute_molecular_complexity_profile
+  tic("Step 4: compute molecular complexity profile and other summary statistics")
+  summary_stats <-
+    compute_summary_stats(
+      outcome_counts,
+      fit_out$glm_estimates$phat,
+      sample_names
+    )
+  toc()
+
+
+  tic("Step 5: reassign read counts, determine cutoff, and mark retained observations")
+
+  outcome_counts <-
+    reassign_reads_and_mark_retained_observations(
+      outcome_counts,
+      summary_stats,
+      sample_names,
+      fit_out,
+      torc
+    )
+  # get the tradoff ratio cutoff
+  summary_stats <- get_threshold(outcome_counts, summary_stats)
+
+  toc()
+
+  tic("Step 6: Purge and save read counts datatable to disk")
+
+  read_counts <-
+    left_join(read_counts %>%
+      select(outcome, cell, umi, gene, sample_names),
+    outcome_counts %>%
+      select(c("outcome", "retain", paste0(sample_names, "_hat"))),
+    by = c("outcome")
+    ) %>%
+    select(-outcome)
+
+  purge_and_save_read_counts(
+    read_counts,
+    dataset_name,
+    sample_names,
+    output_dir
+  )
+
+  toc()
+
+
+  tic("Step 7: create umi counts matrices")
+  umi_counts_cell_gene <-
+    create_umi_counts(
+      read_counts,
+      sample_names
+    )
+  toc()
+
+  outcome_counts <-
+    outcome_counts %>%
+    arrange(-qr) %>%
+    select(-c(paste0(sample_names, "_hat")))
+
+  read_counts <-
+    read_counts %>%
+    select(-c("retain", paste0(sample_names, "_hat")))
+
+  summary_stats$sample_names <- sample_names
+
+  data_list <-
+    list(
+      umi_counts_cell_gene = umi_counts_cell_gene,
+      read_counts = read_counts,
+      outcome_counts = outcome_counts,
+      fit_out = fit_out,
+      summary_stats = summary_stats
+    )
+
+  toc()
+
+  return(data_list)
+}
+
+identify_rna_cells <- function(data_list, output_dir) {
+  tic("Running workflow II")
+
+  tic("Step 7: identify RNA-containing cells")
+  called_cells_out <- call_cells_all_samples(data_list$umi_counts_cell_gene, output_dir)
+  toc()
+
+  tic("Step 9: tallying molecules by cell-barcode")
+
+  umi_counts_cell <- map2(
+    called_cells_out$called_cells,
+    data_list$umi_counts_cell_gene,
+    get_umi_counts_cell
+  )
+
+
+  umi_counts_sample <-
+    map(umi_counts_cell,
+      map_dfr,
+      get_umi_counts_sample,
+      .id = "split"
+    ) %>%
+    bind_rows(.id = "sample")
+
+
+  data_list$summary_stats <-
+    update_summary_stats(
+      data_list$summary_stats,
+      umi_counts_sample
+    )
+  toc()
+
+  data_list <-
+    c(
+      data_list,
+      list(
+        umi_counts_cell = umi_counts_cell,
+        called_cells_tally = called_cells_out$called_cells_tally
+      )
+    )
+
+  toc()
+
+  return(data_list)
+}
+```
+
+# Run workflow Part I
+
+Estimate the sample index hopping probability, infer the true sample of origin, and reassign reads.
+
+
+```{r}
+data_list <- purge_phantoms(input_dir, output_dir, read_counts_filepath, torc=torc)
+```
+
+
+## 1. Show data and summary statistics
+
+### Read counts datatable
+
+```{r}
+data_list$read_counts 
+```
+
+### Outcome counts datatable
+
+The datatable is ordered in descending order of *qr*, the posterior probability of incorrectly assigning *s* as the inferred sample of origin. *n* is the number of CUGs with the corresponding *outcome* and *p_outcome* is the observed marginal probability of that *outcome*.  
+
+```{r }
+data_list$outcome_counts 
+```
+
+
+### Summary statistics of the joined read counts datatable
+
+*p_chimeras* is the proportion CUGs that are chimeric. *g* is the estimated proportion of fugue molecules and *u* is the molecule inflation factor such that *n_cugs x u* would give the number of non-fugue phantom molecules. The estimated total number of phantom molecules present in the dataset is given by  *n_pm=n_cugs x (u+g)*.
+
+```{r}
+ data_list$summary_stats$summary_estimates
+```
+
+### Marginal summary statistics
+
+
+
+```{r}
+ data_list$summary_stats$conditional
+```
+
+
+
+### Molecular proportions complexity profile 
+
+
+```{r}
+ data_list$summary_stats$pi_r_hat
+```
+
+Plot
+
+```{r fig.height=9, fig.width=15, message=FALSE, warning=FALSE}
+p_read <- plot_molecules_distributions(data_list, dataset_name, x_lim=250)
+p_read <- plot_grid(p_read$p, 
+          p_read$legend,
+          ncol=2,
+          rel_widths=c(1, 0.1))
+
+ggsave(file.path(figures_dir,
+                 paste0(dataset_name, "_molcomplexity.pdf")),
+       p_read,
+       width=9,
+       height=6)
+p_read
+```
+
+
+
+## 2. Estimating the sample index hopping rate (*SIHR*)
+
+
+### GLM fit estimates
+
+```{r}
+data_list$fit_out$glm_estimates
+```
+
+### Model fit plot 
+
+```{r fig.height=9, fig.width=15, message=FALSE, warning=FALSE}
+p_fit <- plot_fit(data_list, dataset_name, x_lim=250)
+p_fit <-plot_grid(p_fit$p,
+          p_fit$legend,
+          ncol=2,
+          rel_widths=c(1, 0.2))
+
+ggsave(file.path(figures_dir,
+                 paste0(dataset_name, "_fit.pdf")),
+       p_fit,
+       width=9,
+       height=6)
+p_fit
+```
+
+
+
+## 3. Minimizing false positives using the the tradoff ratio cutoff (torc)
+
+```{r}
+data_list$summary_stats$cutoff_dt
+```
+
+
+The row  *discard_torc* shows the outcome whose *qr* value is the maximum allowed. Reads corresponding to outcomes with greater *qr* values are discarded. *no_discarding* corresponds to retaining all reassigned reads and *no_purging* corresponds to keeping the data as it is. 
+
+### Plot tradoff plots
+
+```{r fig.height=7, fig.width=12, message=FALSE, warning=FALSE}
+p_fp <- plot_fp_reduction(data_list, dataset_name)
+
+ggsave(file.path(figures_dir,
+                 paste0(dataset_name, "_fp_performance.pdf")),
+       p_fp,
+       width=9,
+       height=6)
+p_fp
+```
+
+
+```{r fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+p_tradeoff <- plot_fp_tradoff(data_list, dataset_name)
+
+ggsave(file.path(figures_dir,
+                 paste0(dataset_name, "_tradeoff.pdf")),
+       p_tradeoff,
+       width=9,
+       height=6)
+
+p_tradeoff
+```
+
+
+
+# Part II: Process data for downstream analysis
+
+
+```{r}
+data_list <- identify_rna_cells(data_list, output_dir)
+```
+
+##  Examine the consequences of index hopping 
+
+Here we examine the extent of the effects of index hopping on individual samples and then on cell-barcodes.
+
+### Tally of predicted phantoms by sample
+
+Here *m* is the number of total molecules in millions; *rm_ret* is the number of predicted real molecules and *prm_ret* is the proportion; *rm_disc* is the number of discarded real molecules; and *pm* is the number of predicted phantom molecules. 
+
+```{r}
+data_list$summary_stats$marginal
+```
+
+### Tally of predicted phantoms in called cells 
+
+The called cells were determined from the unpurged data in order to show the level of contamination by phantom molecules if data were not purged.
+
+```{r}
+data_list$summary_stats$marginal_called_cells
+```
+
+
+### Tally of barcodes by concordance between purged and unpurged data
+
+The rows corresponding to *consensus_background* and *consensus_cell* refer to the number of barcodes that were categorized as background cells or rna-containing cells, respectively, no matter whether the data was purged or not. In contrast, *transition_background* and *transition_cell* refer to the number of barcodes that were recatgorized as background and cell, respectively. *phantom_background* and *phantom_cell* are phantom cells that disappear once phantom molecules are purged.
+
+```{r}
+data_list$called_cells_tally
+```
+
+### Table of called cell-barcodes with the highest number of phantoms
+
+```{r}
+data_list$umi_counts_cell %>% 
+  map(list("called_cells"))
+```
+
+### Table of background cell-barcodes with highest number of phantoms
+
+```{r}
+data_list$umi_counts_cell %>% 
+  map(list("background_cells"))
+```
+
+
+### Save ouput to file (optional)
+
+```{r}
+tic("saving output")
+data_list$read_counts <- NULL
+saveRDS(data_list, results_filepath)
+toc()
+```
+
+
+# Session Info
+
+```{r}
+# memory usage
+gc()
+```
+
+```{r}
+sessionInfo()
+```
