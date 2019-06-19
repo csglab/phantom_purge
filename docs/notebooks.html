@@ -72,9 +72,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type = "text/css">
 .main-container {
@@ -192,8 +190,6 @@ $(document).ready(function () {
   menuAnchor.closest('li.dropdown').addClass('active');
 });
 </script>
-
-<div class="container-fluid main-container">
 
 <!-- tabsets -->
 
@@ -341,8 +337,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -351,6 +345,16 @@ div.tocify {
 
 
 </style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
@@ -416,7 +420,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#report"> Report <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -425,7 +429,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-04-23
+<strong>Last updated:</strong> 2019-06-19
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -435,11 +439,11 @@ div.section {
 </p>
 <p>
 This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.2.0). The <em>Report</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.4.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
-<div id="report" class="tab-pane fade">
+<div id="checks" class="tab-pane fade">
 <div id="workflowr-checks" class="panel-group">
 <div class="panel panel-default">
 <div class="panel-heading">
@@ -456,10 +460,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomcsglabphantompurgetree68c8b89f1c0fd42445fe0b95148bf8ea3dd42acbtargetblank68c8b89a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/csglab/phantom_purge/tree/68c8b89f1c0fd42445fe0b95148bf8ea3dd42acb" target="_blank">68c8b89</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomcsglabphantompurgetree858c830263792b5b06948f46b232517fe0f0d6e1targetblank858c830a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/csglab/phantom_purge/tree/858c830263792b5b06948f46b232517fe0f0d6e1" target="_blank">858c830</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomcsglabphantompurgetree68c8b89f1c0fd42445fe0b95148bf8ea3dd42acbtargetblank68c8b89a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomcsglabphantompurgetree858c830263792b5b06948f46b232517fe0f0d6e1targetblank858c830a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -468,10 +472,7 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    output/
-
-Untracked files:
-    Untracked:  docs/assets/
+    Ignored:    code/.Rhistory
 
 </code></pre>
 <p>
@@ -510,6 +511,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/csglab/phantom_purge/blob/f286a6bcef99754e6b9145e9eaaa44ba45065cc4/analysis/notebooks.Rmd" target="_blank">f286a6b</a>
+</td>
+<td>
+rfarouni
+</td>
+<td>
+2019-06-19
+</td>
+<td>
+added notebook
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/csglab/phantom_purge/bc37dab8e8f43a89a63289e87a4025e84402bdfe/docs/notebooks.html" target="_blank">bc37dab</a>
+</td>
+<td>
+rfarouni
+</td>
+<td>
+2019-04-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -631,6 +666,13 @@ Informative commit message
 <ul>
 <li><p><a href="./assets/notebooks/workflow_novaseq_l1.nb.html" target="_blank">Novaseq 6000 Lane 1 Analysis Workflow</a>.</p></li>
 <li><p><a href="./assets/notebooks/workflow_novaseq_l2.nb.html" target="_blank">Novaseq 6000 Lane 2 Analysis Workflow</a>.</p></li>
+</ul>
+</div>
+<div id="experimental-validation-data-analysis" class="section level2">
+<h2>Experimental validation data analysis</h2>
+<ul>
+<li><p><a href="./assets/notebooks/validation_hiseq4000_1.nb.html" target="_blank"> Validation Analysis Notebook Part I</a>.</p></li>
+<li><p><a href="./assets/notebooks/validation_hiseq4000_2.nb.html" target="_blank"> Validation Analysis Notebook Part II</a>.</p></li>
 </ul>
 </div>
 
