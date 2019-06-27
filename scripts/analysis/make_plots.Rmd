@@ -1,0 +1,412 @@
+---
+title: "Phantom Purge"
+subtitle: "make plots"
+author: "Rick Farouni"
+date: '`r format(Sys.Date(), "%Y-%B-%d")`'
+output:
+  html_notebook:
+    df_print: paged
+    code_folding: show
+    toc: yes
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
+---
+
+
+# Preparations
+
+```{r setup}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file(),
+                     fig.width=15,
+                     digit=5,
+                     scipen=8)
+options(digits=5, 
+        scipen=8)
+```
+
+```{r}
+library(tidyverse)
+library(cowplot)
+```
+
+
+```{r}
+dataset_names <- c("hiseq2500", "hiseq4000","novaseq_l1", "novaseq_l2")
+project_dir <- rprojroot::find_rstudio_root_file()
+data_dir <- file.path(project_dir, "data", dataset_names)
+output_dir <- file.path(data_dir, "output")
+figures_dir <- file.path(project_dir, "output", "figures")
+results_filepaths <-
+    file.path(output_dir,
+              sprintf("%s_results.rds",
+                      dataset_names))
+
+
+names(results_filepaths) <- dataset_names
+results_filepaths
+```
+
+```{r message=FALSE}
+code_dir <- file.path(project_dir, "code")
+source(file.path(code_dir, "9_plotting_functions.R"))
+```
+
+
+```{r}
+data <- map(results_filepaths, readRDS)
+```
+
+
+
+```{r, fig.width=15}
+p_rdist <- imap(data, plot_molecules_distributions)
+p_list <- p_rdist %>% map(list("p"))
+legend_list <- p_rdist %>% map(list("legend"))
+p_rdist_all <- plot_grid(plot_grid(p_list[[1]],
+                                   p_list[[2]],
+                                   p_list[[3]], 
+                                   p_list[[4]],
+         # labels=c('A', 'B', 'C', 'D'),
+          align="hv",
+          axis ="tblr"),
+                 plot_grid(legend_list[[1]], legend_list[[3]], ncol=1),
+                 rel_widths=c(1, 0.08))
+p_rdist_all
+```
+
+
+
+```{r, fig.width=15}
+p_fit <- imap(data, plot_fit)
+p_list <- p_fit %>% map(list("p"))
+legend_list <- p_fit %>% map(list("legend"))
+p_fit_all <- 
+  plot_grid(plot_grid(p_list[[1]],
+                                   p_list[[2]],
+                                   p_list[[3]], 
+                                   p_list[[4]],
+          align="hv",
+          axis ="tblr"),
+                 plot_grid(NULL, legend_list[[3]], NULL, ncol=1),
+                 rel_widths=c(1, 0.08))
+p_fit_all
+```
+
+
+
+```{r, fig.width=15}
+p_post <- imap(data, plot_posterior_prob)
+p_list <- p_post %>% map(list("p"))
+legend_list <- p_post %>% map(list("legend"))
+p_post_all <- 
+  plot_grid(
+    plot_grid(
+p_list[[1]],
+                                   p_list[[2]],
+                                   p_list[[3]], 
+                                   p_list[[4]],
+          align="hv",
+          axis ="tblr"),
+                 plot_grid(NULL, legend_list[[3]], NULL, ncol=1),
+                 rel_widths=c(1, 0.08))
+p_post_all
+```
+
+
+```{r}
+save_plot(file.path(figures_dir, "mol_complexity_profile.pdf"), 
+          p_rdist_all,
+          ncol = 3, 
+          nrow = 2,
+          base_height=5,
+          base_aspect_ratio = 1.1
+          )
+```
+
+```{r}
+save_plot(file.path(figures_dir,"p_fit.pdf"), 
+          p_fit_all,
+          ncol = 3, 
+          nrow = 2, 
+          base_height=5,
+          base_aspect_ratio = 1.1
+          )
+```
+
+
+```{r}
+save_plot(file.path(figures_dir,"p_post.pdf"), 
+          p_post_all,
+          ncol = 3, # we're saving a grid plot of 2 columns
+          nrow = 2, # and 2 rows
+          base_height=5,
+          # each individual subplot should have an aspect ratio of 1.3
+          base_aspect_ratio = 1.1
+          )
+```
+
+
+
+
+
+```{r}
+outcome_counts <- imap_dfr(data, list("outcome_counts"), .id="dataset")
+outcome_counts <- outcome_counts %>% filter(q >0.9573 & q <0.9609 )
+```
+
+```{r}
+optimal <- 
+  imap_dfr(data, list("optimal_cutoff"), .id="dataset") %>% 
+  filter(cutoff!="above") %>%
+  select(-qs,-o, -FNR)
+
+optimal[,4:6] <- round(optimal[,4:6], 6)
+
+optimal
+```
+```{r}
+Hmisc::latex( optimal , file="", rowname=NULL, booktabs=TRUE, size="small")
+```
+```{r}
+conditional <- 
+  imap_dfr(data, list("reads_dist_summary", "conditional"), .id="dataset")
+
+conditional <- conditional %>% filter(r< 5)
+```
+
+
+```{r}
+marginal <- 
+  imap_dfr(data, list("reads_dist_summary", "marginal"), .id="dataset")  %>% 
+  mutate(rom= n_reads/m,
+         m= m/1000000) %>%
+  select(sample,m, r_a, r_b, f, prop_m, prop_reads, rom)
+
+marginal
+```
+```{r}
+
+marginal[,3:5] <- round(marginal[,3:5], 4)
+marginal[,c(2)] <- round(marginal[,c(2)], 2)
+marginal[,c(6,7)] <- round(marginal[,c(6,7)], 3)
+marginal[,c(8)] <- round(marginal[,c(8)], 1)
+marginal
+```
+
+```{r}
+Hmisc::latex( marginal , file="", rowname=NULL, booktabs=TRUE, size="small")
+```
+
+```{r}
+called_cells_tally <- 
+  imap(data, list("called_cells_tally")) 
+
+called_cells_tally
+```
+
+
+
+```{r}
+transpose_called_cells <- function( dataset){
+  
+  called_cells <- data.table::transpose(dataset[,-1]) %>%
+  set_names(dataset$barcode) %>% 
+  mutate(sample=colnames(dataset)[-1]) %>%
+  select(sample, phantom_cell, phantom_background, consensus_cell, consensus_background, transition_cell, transition_background)
+  
+  return(called_cells)
+}
+```
+
+```{r}
+called_cells_tally <- map(called_cells_tally, transpose_called_cells)
+```
+
+```{r}
+Hmisc::latex( called_cells_tally$hiseq4000 , file="", rowname=NULL, booktabs=TRUE, size="small")
+```
+
+
+
+## plot phantoms
+
+```{r}
+plot_phantoms_by_cell <- function(umi_counts_cell, umi_counts_sample){
+  
+  p1 <- ggplot(umi_counts_cell %>%
+                 filter(f > 0),
+               aes(x = m,
+                   y = f) ) +
+    geom_point(
+               shape = '.',
+               alpha = .7) +
+   # geom_hex(binwidth = c(.2, .2)) +
+    geom_text(
+      data    = umi_counts_sample,
+      mapping = aes(
+        x = Inf,
+        y = Inf,
+        label = sprintf(
+          "n_molecules=%10.1e
+           p_phantoms = %.4f",
+          m,
+          p_fantoms
+        )
+      ),
+      hjust   = 1.1,
+      vjust   = 1.5,
+      size = 3
+    ) +
+    coord_fixed() +
+    scale_x_log10() +
+    scale_y_log10() +
+    theme_bw() +
+    labs(x = "Number of Observed Molecules",
+         y = "Number of Phantom Molecules")+
+    facet_grid( dataset~sample)  
+  
+  
+
+  return(p1)
+}
+
+
+plot_phantoms_by_gene <- function(umi_counts_gene, umi_counts_sample){
+   
+
+  
+  
+  p1 <- ggplot(umi_counts_gene %>%
+                 filter(f > 0), aes(x = m,
+                   y = f)) +
+    geom_point(shape = '.',
+               alpha = .7) +
+ #   geom_hex(binwidth = c(.2, .2)) +
+    geom_text(
+      data    = umi_counts_sample,
+      mapping = aes(
+        x = Inf,
+        y = Inf,
+        label = sprintf(
+          "n_molecules=%10.1e
+           p_phantoms = %.4f",
+          m,
+          p_fantoms
+        )
+      ),
+      hjust   = 1.1,
+      vjust   = 1.5,
+      size = 3
+    ) +
+    coord_fixed() +
+    scale_x_log10() +
+    scale_y_log10()+
+    theme_bw() +
+    labs(x = "Number of Observed Molecules",
+         y = "Number of Phantom Molecules")  +
+    facet_grid( dataset~sample)  
+  
+
+  return(p1)
+}
+
+```
+```{r}
+data$
+```
+
+
+```{r}
+get_umi_counts_sample <- function(data){
+  
+    data$umi_counts_sample <- 
+    data$umi_counts_cell  %>%
+    ungroup() %>%
+    select(c("sample","m", "f"))  %>%
+    group_by(sample) %>%
+    summarize(m = sum(m),
+              f = sum(f)) %>%
+    mutate(p_fantoms = f / m)
+    
+    return(data)
+  
+}
+```
+
+
+```{r}
+data <- map(data, get_umi_counts_sample)
+```
+
+```{r}
+umi_counts_cell_hiseq <- map_dfr( data[1:2], list("umi_counts_cell"), .id="dataset")
+umi_counts_gene_hiseq <- map_dfr( data[1:2], list("umi_counts_gene"), .id="dataset")
+umi_counts_sample_hiseq <- map_dfr( data[1:2], list("umi_counts_sample"), .id="dataset")
+```
+
+
+
+
+```{r}
+p_phantoms_cell <- plot_phantoms_by_cell(umi_counts_cell_hiseq, umi_counts_sample_hiseq )
+```
+
+
+```{r fig.width=16}
+p_phantoms_cell
+```
+```{r}
+p_phantoms_gene<- plot_phantoms_by_gene(umi_counts_gene_hiseq, umi_counts_sample_hiseq )
+```
+
+```{r fig.width=16}
+p_phantoms_gene
+```
+
+
+
+```{r, fig.width=16}
+p_phantom_hiseq_all <- 
+    plot_grid(
+          p_phantoms_cell ,
+          p_phantoms_gene,
+          labels = c("Cells", "Genes"),
+          align="hv",
+          axis ="tblr",
+          nrow=2)
+p_phantom_hiseq_all
+```
+
+
+```{r}
+save_plot("p_phantom_hiseq.pdf", 
+          p_phantom_hiseq_all,
+          ncol = 1, # we're saving a grid plot of 2 columns
+          nrow = 2, # and 2 rows
+          base_height=5,
+          # each individual subplot should have an aspect ratio of 1.3
+          base_aspect_ratio = 3.5
+          )
+```
+
+
+
+```{r, fig.width=20}
+plot_grid(
+          p_phantoms_cell$Hiseq2500,
+          p_phantoms_cell$Hiseq4000,
+          align="hv",
+          ncol=2,
+          axis ="tblr")
+```
+
+```{r}
+  
+  
+  p_phantoms <- plot_phantoms(data$umi_counts_cell,
+                            data$umi_counts_gene, 
+                            data$umi_counts_sample)
+  
+```
+

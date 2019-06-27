@@ -83,9 +83,7 @@ figures_dir <- file.path(output_dir, "figures")
 read_counts_filepath <- file.path(output_dir,
                                   sprintf("%s_read_counts.rds", 
                                           dataset_name))
-results_filepath <- file.path(output_dir, 
-                              sprintf("%s_results.rds", 
-                                      dataset_name))
+
 ```
 
 
@@ -479,10 +477,28 @@ data_list$umi_counts_cell %>%
 ### Save ouput to file (optional)
 
 ```{r}
-tic("saving output")
-data_list$read_counts <- NULL
-saveRDS(data_list, results_filepath)
-toc()
+# tic("saving output")
+# read_counts_filepath <- file.path(output_dir, 
+#                               sprintf("%s_read_counts.rds", 
+#                                       dataset_name))
+# 
+# 
+# saveRDS(data_list$read_counts, read_counts_filepath)
+# data_list$read_counts <- NULL
+# umi_counts_cell_gene_filepath <- file.path(output_dir, 
+#                               sprintf("%s_umi_counts_cell_gene.rds", 
+#                                       dataset_name))
+# 
+# 
+# saveRDS(data_list$umi_counts_cell_gene, umi_counts_cell_gene_filepath)
+# 
+# data_list$umi_counts_cell_gene <- NULL
+# 
+# results_filepath <- file.path(output_dir, 
+#                               sprintf("%s_results.rds", 
+#                                       dataset_name))
+# saveRDS(data_list, results_filepath)
+# toc()
 ```
 
 
