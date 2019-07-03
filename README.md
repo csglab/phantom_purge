@@ -38,7 +38,8 @@ Rscript -e 'library(rmarkdown); rmarkdown::render("./code/run_workflow.Rmd", "al
 ```
 where `${dataset_name}` is the name of the folder containing all the *molecule_info.h5* files for all the samples that were multiplexed on the same lane. The files should be renamed by the sample name as such **sample_name.h5** 
 
+Contact
+---------
 
-
-
+We use GitHub [issues](https://github.com/csglab/phantom_purge/issues) for tracking requests and bugs. Please submit an new issue if you any comment or you would like to report a software bug.
  
