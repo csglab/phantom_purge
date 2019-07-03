@@ -81,7 +81,7 @@ plot_molecules_distributions <- function(data_list, dataset_name, x_lim = 150) {
       axis.title.x = element_text(size = rel(.7)),
       axis.title.y = element_text(size = rel(.7)),
       axis.text.y = element_blank()
-    ) #+
+    ) 
   # geom_vline(data=sample_stats,
   #           aes(xintercept = r_thresh),
   #          linetype = "dashed")
@@ -129,7 +129,7 @@ plot_fit <- function(data_list,
     )) +
     geom_line(aes(r,
       pcum_cugs,
-      colour = "cumsum cugs"
+      colour = "CUGs (cumsum)"
     )) +
     theme_bw() +
     labs(
@@ -223,7 +223,7 @@ plot_fit <- function(data_list,
 
 
 
-plot_fp_reduction <- function(data_list,
+plot_tradeoff <- function(data_list,
                      dataset_name) {
   
  outcome_counts <- data_list$outcome_counts
@@ -238,7 +238,8 @@ plot_fp_reduction <- function(data_list,
     geom_point(
       aes(x = FP,
           y = FN),
-      size=1)+
+      size=.2,
+      alpha=.2)+
     labs(x="False Positives",
          y="False Negatives") +
     geom_point(data=data_list$summary_stats$cutoff_dt %>% 
@@ -247,32 +248,37 @@ plot_fp_reduction <- function(data_list,
                    y = FN,
                    shape=approach),
                size=2,
-               colour="darkblue")+
+               colour="coral")+
     scale_x_sqrt() +
     scale_y_sqrt() +
     theme_bw()  +
    theme(
      legend.title = element_text(face = "bold")
-   )
+   )+
+   scale_x_continuous(labels = scientific)+
+   scale_y_continuous(labels = scientific)
     
-  
+ legend <- get_legend(p1)
+ p1 <- p1 + theme(legend.position = "none")
   p1 <- ggdraw() +
     draw_plot(p1, 0, 0, 1, 1) +
     draw_label(dataset_name,
                x = 0,
                y = 1,
                vjust = 2,
-               hjust = -1.3,
+               hjust = -1.8,
                size = 12,
                fontface = "italic"
     )
   
+
   
-  return( p1)
+  
+  return( list(p = p1, legend = legend))
 }
 
 
-plot_fp_tradoff <- function(data_list,
+plot_tor <- function(data_list,
                               dataset_name) {
   
   outcome_counts <- data_list$outcome_counts
@@ -283,15 +289,16 @@ plot_fp_tradoff <- function(data_list,
     geom_point(
       aes(x = FPm,
           y = FNm),
-      size=.5)+
+      size=.2,
+      alpha=0.2)+
     labs(x="Marginal Decrease in False Positives (reduce phantom molecs) ",
          y="Marginal Increase in False Negatives (discard real molecs)") +
     geom_point(data=data_list$summary_stats$cutoff_dt %>% 
                  filter(approach %in% c( "discard_torc")),
                aes(x = FPm,
                    y = FNm),
-               size=2,
-               colour="purple") +
+               size=1.5,
+               colour="coral") +
     geom_line(
       aes(x = FPm,
           y = FPm,
@@ -321,9 +328,11 @@ plot_fp_tradoff <- function(data_list,
     theme_bw()  +
       theme(
         legend.title = element_text(face = "bold")) + 
-      scale_color_discrete(name = "TORC") 
+      scale_color_discrete(name = "TORC")  +
+    scale_x_continuous(labels = scientific)
     
-  
+  legend <- get_legend(p1)
+  p1 <- p1 + theme(legend.position = "none")
   
   p1 <- ggdraw() +
     draw_plot(p1, 0, 0, 1, 1) +
@@ -335,9 +344,9 @@ plot_fp_tradoff <- function(data_list,
                size = 12,
                fontface = "italic"
     )
+
   
-  
-  return(p1)
+  return( list(p = p1, legend = legend))
 }
 
 make_plots <- function(data_list, dataset_name, x_lim = 160) {

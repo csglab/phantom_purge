@@ -32,6 +32,7 @@ library(furrr)
 library(tictoc)
 library(data.table)
 library(cowplot)
+library(scales)
 plan(multiprocess)
 ```
 
@@ -51,7 +52,7 @@ options(readr.show_progress = FALSE,
 
 ```{r}
 dataset_name <- commandArgs(trailingOnly=T)[1]
-#dataset_name <-"hiseq2500"
+dataset_name <-"hiseq2500"
 message(sprintf("Dataset name: %s", dataset_name))
 ```
 
@@ -342,17 +343,12 @@ data_list$outcome_counts
 Plot
 
 ```{r fig.height=9, fig.width=15, message=FALSE, warning=FALSE}
-p_read <- plot_molecules_distributions(data_list, dataset_name, x_lim=250)
+p_read <- plot_molecules_distributions(data_list, dataset_name, x_lim=200)
 p_read <- plot_grid(p_read$p, 
           p_read$legend,
           ncol=2,
           rel_widths=c(1, 0.1))
 
-ggsave(file.path(figures_dir,
-                 paste0(dataset_name, "_molcomplexity.pdf")),
-       p_read,
-       width=9,
-       height=6)
 p_read
 ```
 
@@ -370,17 +366,13 @@ data_list$fit_out$glm_estimates
 ### Model fit plot 
 
 ```{r fig.height=9, fig.width=15, message=FALSE, warning=FALSE}
-p_fit <- plot_fit(data_list, dataset_name, x_lim=250)
+p_fit <- plot_fit(data_list, dataset_name, x_lim=200)
 p_fit <-plot_grid(p_fit$p,
           p_fit$legend,
           ncol=2,
           rel_widths=c(1, 0.2))
 
-ggsave(file.path(figures_dir,
-                 paste0(dataset_name, "_fit.pdf")),
-       p_fit,
-       width=9,
-       height=6)
+
 p_fit
 ```
 
@@ -398,29 +390,59 @@ The row  *discard_torc* shows the outcome whose *qr* value is the maximum allowe
 ### Plot tradoff plots
 
 ```{r fig.height=7, fig.width=12, message=FALSE, warning=FALSE}
-p_fp <- plot_fp_reduction(data_list, dataset_name)
+p_tradeoff <- plot_tradeoff(data_list, dataset_name)
+p_tradeoff <-
+  plot_grid(p_tradeoff$p,
+            p_tradeoff$legend,
+            ncol=2,
+            rel_widths=c(1, 0.12))
 
-ggsave(file.path(figures_dir,
-                 paste0(dataset_name, "_fp_performance.pdf")),
-       p_fp,
-       width=9,
-       height=6)
-p_fp
-```
-
-
-```{r fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
-p_tradeoff <- plot_fp_tradoff(data_list, dataset_name)
-
-ggsave(file.path(figures_dir,
-                 paste0(dataset_name, "_tradeoff.pdf")),
-       p_tradeoff,
-       width=9,
-       height=6)
 
 p_tradeoff
 ```
 
+
+```{r fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+p_tor <- plot_tor(data_list, dataset_name)
+
+p_tor <-
+  plot_grid(p_tor$p,
+            p_tor$legend,
+            ncol=2,
+            rel_widths=c(1, 0.12))
+
+
+
+p_tor
+```
+
+
+### Save plots (optional)
+```{r}
+# ggsave(file.path(figures_dir,
+#                  paste0(dataset_name, "_molcomplexity.pdf")),
+#        p_read,
+#        width=9,
+#        height=6)
+# 
+# ggsave(file.path(figures_dir,
+#                  paste0(dataset_name, "_fit.pdf")),
+#        p_fit,
+#        width=9,
+#        height=6)
+# ggsave(file.path(figures_dir,
+#                  paste0(dataset_name, "_tradeoff.pdf")),
+#        p_tradeoff,
+#        width=9,
+#        height=6)
+# 
+# ggsave(file.path(figures_dir,
+#                  paste0(dataset_name, "_tor.pdf")),
+#        p_tor,
+#        width=9,
+#        height=6)
+
+```
 
 
 # Part II: Process data for downstream analysis
