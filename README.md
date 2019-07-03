@@ -21,9 +21,13 @@ The paper's [website](https://csglab.github.io/phantom_purge/index.html) hosts c
 
 
 
+Validation Data
+---------
 
-Code
-_____
+The preprocessed read count datatable that was used for experimentally validating the method is found in the *data* sub-directory.
+
+Software
+---------
 
 Code to run the phantom purge workflow.
 
@@ -35,11 +39,6 @@ Rscript -e 'library(rmarkdown); rmarkdown::render("./code/run_workflow.Rmd", "al
 where `${dataset_name}` is the name of the folder containing all the *molecule_info.h5* files for all the samples that were multiplexed on the same lane. The files should be renamed by the sample name as such **sample_name.h5** 
 
 
-Validation Data
----------
-
-
-The preprocessed read count datatable that was used for experimentally validating the method is found in the *data* sub-directory.
 
 
  
