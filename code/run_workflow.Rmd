@@ -52,7 +52,7 @@ options(readr.show_progress = FALSE,
 
 ```{r}
 dataset_name <- commandArgs(trailingOnly=T)[1]
-dataset_name <-"hiseq2500"
+#dataset_name <-"hiseq2500"
 message(sprintf("Dataset name: %s", dataset_name))
 ```
 
