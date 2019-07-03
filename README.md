@@ -27,7 +27,7 @@ The preprocessed read count datatable that was used for experimentally validatin
 
 Installation Requirements
 ----------
-The code was tested using R version 3.6.0 running on Ubuntu 18.04.2 LTS and R version 3.5.2 running on CentOS Linux 7.
+The code was tested using R 3.6.0 running on Ubuntu 18.04.2 LTS and R 3.5.2 running on CentOS Linux 7.
 
 To run the code, the following R packages are required.
 
