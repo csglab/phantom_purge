@@ -22,7 +22,10 @@ The paper's [website](https://csglab.github.io/phantom_purge/index.html) hosts c
 Validation Data
 ---------
 
-The preprocessed read count datatable that was used for experimentally validating the method is found in the *data* sub-directory.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3267922.svg)](https://doi.org/10.5281/zenodo.3267922)
+
+
+The preprocessed read count datatable that was used for experimentally validating the method can be found on Zenodo. 
 
 
 Installation Requirements
