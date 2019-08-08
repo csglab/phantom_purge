@@ -8,7 +8,7 @@ This repository hosts code and R Markdown notebooks implementing the statistical
 Paper
 -------
 
-The bioRxiv preprint describing the approach can be accessed [here](https://www.biorxiv.org/content/10.1101/617225v1).
+The bioRxiv preprint describing the approach can be accessed [here](https://www.biorxiv.org/content/10.1101/617225v4).
 
 The optimal purging of phantom molecules in multiplexed droplet-based single-cell RNA-seq data. ([R. Farouni](http://rfarouni.github.io/) and [H. S. Najafabadi](http://csg.lab.mcgill.ca/), 2019)
 
